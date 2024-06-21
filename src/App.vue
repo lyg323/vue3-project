@@ -1,52 +1,41 @@
 <template>
-  <p>{{ name1 }}</p>
-  <p>{{ name2 }}</p>
-  <p>{{ name3 }}</p>
-
-  <button class="btn btn-primary" v-on:click="updateName">Click</button>
+  <div class="container">
+    <h2>To-Do List</h2>
+    <form class="d-flex" @submit.prevent="onSubmit">
+      <div class="flex-grow-1 mr-2">
+        <input class="form-control" type="text" v-model="todo" placeholder="Type new to-do" />
+      </div>
+      <div>
+        <button class="btn btn-primary" type="submit">Add</button>
+      </div>
+    </form>
+    {{ todos }}
+  </div>
 </template>
 
 <script>
-import { ref, reactive } from 'vue';
+import { ref } from 'vue';
 
 export default {
   setup() {
-    // 함수
-    // const name = 'test';
-    // const greeting = (name) => {
-    //   return 'Hello, ' + name
-    // }
-    // const greet = greeting(name)
+    const todo = ref('');
+    const todos = ref([]);
 
-    // return {
-    //   greet
-    // }
+    const onSubmit = (e) => {
+      // e.preventDefault();
+      // @submit.prevent와 같음
 
-    // ref, reactive
-    const name1 = ref('test');
-    const name2 = ref({
-      id: 1
-    });
-    const name3 = reactive({
-      id: 1
-    });
-
-    const updateName = () => {
-      // ref : number, string
-      name1.value = 'test test';
-
-      // ref : object, array
-      name2.value.id = '2';
-
-      // reactive : object, array
-      name3.id = '2';
+      // 객체 추가
+      todos.value.push({
+        id: Date.now(),
+        subject: todo.value
+      });
     };
 
     return {
-      name1,
-      name2,
-      name3,
-      updateName
+      todo,
+      todos,
+      onSubmit
     };
   }
 };
