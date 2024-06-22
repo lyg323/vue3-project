@@ -5,13 +5,13 @@
   --color-text: #181818;
   --section-gap: 160px;
 }
-
+/* 
 @media (prefers-color-scheme: dark) {
   :root {
     --color-background: #181818;
     --color-text: #ffffff;
   }
-}
+} */
 
 *,
 *::before,
