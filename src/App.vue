@@ -8,6 +8,16 @@
 
     <div v-if="!filteredTodos.length">There is nothing to display</div>
     <TodoList :todos="filteredTodos" @toggle-todo="toggleTodo" @delete-todo="deleteTodo" />
+    <hr />
+    <nav aria-label="Page navigation example">
+      <ul class="pagination">
+        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+        <li class="page-item"><a class="page-link" href="#">1</a></li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+      </ul>
+    </nav>
   </div>
 </template>
 
@@ -25,6 +35,26 @@ export default {
   setup() {
     const todos = ref([]);
     const error = ref('');
+    const totalPage = ref(0);
+    const limit = 5;
+    const page = ref(1);
+
+    const getTodos = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:3000/todos?_page=${page.value}&_limit=${limit}`
+        );
+
+        const total = await axios.get('http://localhost:3000/todos');
+        totalPage.value = total.data.length;
+
+        todos.value = res.data;
+      } catch (err) {
+        console.log(err);
+        error.value = 'Something went wrong.';
+      }
+    };
+    getTodos();
 
     // async/await: 비동기 함수
     const addTodo = async (todo) => {
@@ -59,12 +89,31 @@ export default {
     //     });
     // };
 
-    const deleteTodo = (index) => {
-      todos.value.splice(index, 1);
+    const deleteTodo = async (index) => {
+      error.value = '';
+      const id = todos.value[index].id;
+      try {
+        axios.delete('http://localhost:3000/todos/' + id);
+        todos.value.splice(index, 1);
+      } catch (err) {
+        console.log(err);
+        error.value = 'Something went wrong.';
+      }
     };
 
-    const toggleTodo = (index) => {
-      todos.value[index].completed = !todos.value[index].completed;
+    const toggleTodo = async (index) => {
+      error.value = '';
+      const id = todos.value[index].id;
+      try {
+        axios.patch('http://localhost:3000/todos/' + id, {
+          completed: !todos.value[index].completed
+        });
+
+        todos.value[index].completed = !todos.value[index].completed;
+      } catch (err) {
+        console.log(err);
+        error.value = 'Something went wrong.';
+      }
     };
 
     const searchText = ref('');
@@ -84,7 +133,8 @@ export default {
       toggleTodo,
       searchText,
       filteredTodos,
-      error
+      error,
+      getTodos
     };
   }
 };
